@@ -255,6 +255,73 @@ img{max-width:100%;display:block}
 }
 .hero-date-dot{color:var(--rose);font-size:0.6rem}
 
+/* ── HERO ACTION BUTTONS ── */
+.hero-action-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-top: 3.5rem;
+  opacity: 0;
+  animation: fadeUp 1.5s 2.1s forwards;
+  z-index: 10;
+  position: relative;
+}
+
+.hero-btn {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(0.72rem, 1.3vw, 0.9rem);
+  letter-spacing: 0.22em;
+  color: var(--gold);
+  text-decoration: none;
+  padding: 1.1rem 2.8rem;
+  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  border-radius: 4px;
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4), inset 0 0 10px rgba(212, 175, 55, 0.05);
+  cursor: pointer;
+}
+
+.hero-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, transparent, rgba(255, 240, 180, 0.22), transparent);
+  transform: translateX(-100%);
+  transition: transform 0.8s ease;
+  z-index: 1;
+}
+
+.hero-btn:hover::before {
+  transform: translateX(100%);
+}
+
+.hero-btn:hover {
+  color: #fff;
+  border-color: var(--gold);
+  transform: translateY(-4px) scale(1.03);
+  box-shadow: 0 12px 35px rgba(212, 175, 55, 0.28), inset 0 0 15px rgba(212, 175, 55, 0.12);
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.6);
+}
+
+@media (max-width: 600px) {
+  .hero-action-buttons {
+    flex-direction: column;
+    gap: 1.2rem;
+    align-items: center;
+    margin-top: 2.5rem;
+  }
+  .hero-btn {
+    width: min(80vw, 280px);
+    padding: 0.95rem 2rem;
+  }
+}
+
 .scroll-cue{
   position:absolute;bottom:3rem;left:50%;transform:translateX(-50%);
   z-index:5;display:flex;flex-direction:column;align-items:center;gap:0.5rem;
@@ -2226,6 +2293,11 @@ img{max-width:100%;display:block}
       <span class="hero-date-dot">✦</span>
       <span class="hero-date-text">7 &nbsp; JULY &nbsp; 2026 &nbsp; · &nbsp; JAORA | Shamgarh</span>
       <span class="hero-date-dot">✦</span>
+    </div>
+
+    <div class="hero-action-buttons">
+      <a href="#ladke" class="hero-btn ladke-btn">Ladke Wale</a>
+      <a href="#ladki" class="hero-btn ladki-btn">Ladki Wale</a>
     </div>
   </div>
 
