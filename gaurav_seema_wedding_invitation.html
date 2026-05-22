@@ -925,6 +925,14 @@ img{max-width:100%;display:block}
 .mute-btn:hover{
   background:rgba(212,175,55,0.15);
   box-shadow:0 0 30px rgba(212,175,55,0.3);
+  transform: scale(1.05);
+}
+.mute-btn:not(.is-paused) {
+  animation: spinSlow 8s linear infinite;
+}
+@keyframes spinSlow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 /* ════════════════════════════════════════════════
@@ -2803,6 +2811,7 @@ img{max-width:100%;display:block}
 </div><!-- end #main -->
 
 <button class="mute-btn" id="muteBtn" title="Toggle music" aria-label="Toggle ambient sound">♪</button>
+<audio id="bgMusic" src="perfect.mp3" loop preload="auto"></audio>
 
 <script>
 // ═══════════════════════════════════════════════
@@ -3132,48 +3141,91 @@ const immersionObs = new IntersectionObserver(entries => {
 document.querySelectorAll('.photo-immersion').forEach(el => immersionObs.observe(el));
 
 // ═══════════════════════════════════════════════
-// AUDIO — Ambient
+// AUDIO SYSTEM — Perfect.mp3 Background & SFX
 // ═══════════════════════════════════════════════
+const bgMusic = document.getElementById('bgMusic');
+const muteBtn = document.getElementById('muteBtn');
 let audioCtx = null, masterGain = null, muted = false;
+
 function initAudio() {
+  if (audioCtx) return;
   try {
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     masterGain = audioCtx.createGain();
     masterGain.gain.setValueAtTime(0.07, audioCtx.currentTime);
     masterGain.connect(audioCtx.destination);
-    const freqs = [220, 277.18, 329.63, 369.99, 440, 493.88];
-    freqs.forEach((f, i) => {
-      const osc = audioCtx.createOscillator();
-      const g = audioCtx.createGain();
-      osc.type = 'sine'; osc.frequency.value = f;
-      g.gain.setValueAtTime(0.012 / (i + 1), audioCtx.currentTime);
-      const lfo = audioCtx.createOscillator();
-      const lg = audioCtx.createGain();
-      lfo.frequency.value = 0.15 + i * 0.06; lg.gain.value = 0.004;
-      lfo.connect(lg); lg.connect(g.gain);
-      lfo.start(); osc.connect(g); g.connect(masterGain); osc.start();
-    });
-    const bufSize = audioCtx.sampleRate * 4;
-    const buf = audioCtx.createBuffer(1, bufSize, audioCtx.sampleRate);
-    const d = buf.getChannelData(0);
-    for (let i = 0; i < bufSize; i++) d[i] = (Math.random() * 2 - 1) * 0.3;
-    const src = audioCtx.createBufferSource();
-    src.buffer = buf; src.loop = true;
-    const lpf = audioCtx.createBiquadFilter();
-    lpf.type = 'lowpass'; lpf.frequency.value = 350; lpf.Q.value = 4;
-    const ng = audioCtx.createGain(); ng.gain.value = 0.03;
-    src.connect(lpf); lpf.connect(ng); ng.connect(masterGain); src.start();
-  } catch (e) {}
+  } catch (e) {
+    console.error("Web Audio API not supported:", e);
+  }
 }
 
-document.getElementById('muteBtn').addEventListener('click', () => {
-  if (!audioCtx) initAudio();
-  muted = !muted;
-  if (masterGain) masterGain.gain.setTargetAtTime(muted ? 0 : 0.07, audioCtx.currentTime, 0.5);
-  const btn = document.getElementById('muteBtn');
-  btn.textContent = muted ? '♪̶' : '♪';
-  btn.style.opacity = muted ? '0.5' : '1';
-});
+// Play background music
+function playBackgroundMusic() {
+  if (!bgMusic) return;
+  initAudio();
+  bgMusic.play().then(() => {
+    muted = false;
+    if (muteBtn) {
+      muteBtn.textContent = '♪';
+      muteBtn.style.opacity = '1';
+      muteBtn.classList.remove('is-paused');
+    }
+  }).catch((err) => {
+    console.log("Autoplay prevented. Waiting for user interaction.");
+    // Autoplay blocked: wait for click to play
+    document.addEventListener('click', forcePlayOnInteraction, { once: true });
+    document.addEventListener('touchstart', forcePlayOnInteraction, { once: true });
+  });
+}
+
+function forcePlayOnInteraction() {
+  if (bgMusic && bgMusic.paused && !muted) {
+    bgMusic.play().then(() => {
+      if (muteBtn) {
+        muteBtn.textContent = '♪';
+        muteBtn.style.opacity = '1';
+        muteBtn.classList.remove('is-paused');
+      }
+    }).catch(err => console.log("Failed to play on interaction:", err));
+  }
+  initAudio();
+}
+
+// Toggle play/pause
+function toggleMusic() {
+  if (!bgMusic) return;
+  initAudio();
+  if (bgMusic.paused) {
+    bgMusic.play().then(() => {
+      muted = false;
+      if (masterGain) masterGain.gain.setTargetAtTime(0.07, audioCtx.currentTime, 0.2);
+      if (muteBtn) {
+        muteBtn.textContent = '♪';
+        muteBtn.style.opacity = '1';
+        muteBtn.classList.remove('is-paused');
+      }
+    }).catch(err => console.error("Play failed:", err));
+  } else {
+    bgMusic.pause();
+    muted = true;
+    if (masterGain) masterGain.gain.setTargetAtTime(0, audioCtx.currentTime, 0.2);
+    if (muteBtn) {
+      muteBtn.textContent = '♪̶';
+      muteBtn.style.opacity = '0.5';
+      muteBtn.classList.add('is-paused');
+    }
+  }
+}
+
+if (muteBtn) {
+  muteBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    toggleMusic();
+  });
+}
+
+// Try autoplaying after a very small delay to allow loading
+setTimeout(playBackgroundMusic, 500);
 
 // ═══════════════════════════════════════════════
 // FAMILY PHOTOGRAPHS & 3D BURST SYSTEM
@@ -3616,7 +3668,7 @@ setTimeout(() => {
   animateEnvelopeCanvas();
 }, 250);
 
-document.addEventListener('click', () => { if (!audioCtx) initAudio(); }, { once: true });
+document.addEventListener('click', () => { if (bgMusic && bgMusic.paused && !muted) playBackgroundMusic(); }, { once: true });
 
 // ═══════════════════════════════════════════════
 // PREMIUM DYNAMIC FLOATING NAVBAR SYSTEM

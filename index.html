@@ -925,6 +925,14 @@ img{max-width:100%;display:block}
 .mute-btn:hover{
   background:rgba(212,175,55,0.15);
   box-shadow:0 0 30px rgba(212,175,55,0.3);
+  transform: scale(1.05);
+}
+.mute-btn:not(.is-paused) {
+  animation: spinSlow 8s linear infinite;
+}
+@keyframes spinSlow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 /* ════════════════════════════════════════════════
