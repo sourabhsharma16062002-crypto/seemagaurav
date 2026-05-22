@@ -1919,6 +1919,208 @@ img{max-width:100%;display:block}
     display: none;
   }
 }
+
+/* ════════════════════════════════════════════════
+   PREMIUM STICKY NAVIGATION BAR
+   ════════════════════════════════════════════════ */
+#luxury-navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 9980;
+  background: rgba(5, 2, 5, 0.72);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(212, 175, 55, 0.15);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+  transition: transform 0.4s cubic-bezier(0.25, 1, 0.3, 1), background-color 0.4s ease;
+  transform: translateY(0);
+}
+#luxury-navbar.nav-hidden {
+  transform: translateY(-100%);
+}
+.nav-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0.9rem 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.nav-logo {
+  font-family: 'Cinzel', serif;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--gold);
+  text-decoration: none;
+  letter-spacing: 0.1em;
+  text-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: opacity 0.3s ease;
+}
+.nav-logo:hover {
+  opacity: 0.85;
+}
+.nav-logo .heart {
+  color: var(--rose);
+  animation: beat 1.2s ease infinite alternate;
+  font-size: 1.1rem;
+  display: inline-block;
+}
+@keyframes beat {
+  to { transform: scale(1.15); filter: drop-shadow(0 0 6px var(--rose)); }
+}
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 1.8rem;
+}
+.nav-item {
+  font-family: 'Cinzel', serif;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  color: var(--cream);
+  text-decoration: none;
+  position: relative;
+  padding: 0.4rem 0;
+  opacity: 0.75;
+  transition: opacity 0.3s ease, color 0.3s ease;
+}
+.nav-item::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  height: 1px;
+  background: var(--gold);
+  transition: width 0.4s cubic-bezier(0.25, 1, 0.3, 1), left 0.4s cubic-bezier(0.25, 1, 0.3, 1);
+}
+.nav-item:hover, .nav-item.active {
+  color: var(--gold);
+  opacity: 1;
+}
+.nav-item:hover::after, .nav-item.active::after {
+  width: 100%;
+  left: 0;
+}
+
+/* Mobile Nav Toggle */
+.mobile-nav-toggle {
+  display: none;
+  flex-direction: column;
+  gap: 6px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  z-index: 9982;
+}
+.mobile-nav-toggle .bar {
+  width: 26px;
+  height: 2px;
+  background-color: var(--gold);
+  border-radius: 2px;
+  transition: all 0.3s cubic-bezier(0.25, 1, 0.3, 1);
+}
+.mobile-nav-toggle:hover .bar {
+  background-color: #fff;
+  box-shadow: 0 0 8px rgba(212, 175, 55, 0.8);
+}
+
+/* Mobile Nav Overlay */
+.mobile-nav-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(5, 2, 5, 0.95);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  z-index: 9985;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.mobile-nav-overlay.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+.mobile-nav-menu {
+  text-align: center;
+  transform: scale(0.9);
+  transition: transform 0.5s cubic-bezier(0.25, 1, 0.3, 1);
+  padding: 2rem;
+  width: 100%;
+}
+.mobile-nav-overlay.open .mobile-nav-menu {
+  transform: scale(1);
+}
+.mobile-nav-close {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  font-size: 2.5rem;
+  background: none;
+  border: none;
+  color: var(--gold);
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+.mobile-nav-close:hover {
+  transform: rotate(90deg);
+}
+.mobile-nav-logo {
+  font-family: 'Cinzel', serif;
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: var(--gold);
+  margin-bottom: 0.5rem;
+  text-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
+}
+.mobile-nav-logo span {
+  color: var(--rose);
+}
+.mobile-ornament {
+  color: var(--gold);
+  font-size: 0.9rem;
+  letter-spacing: 0.4em;
+  margin-bottom: 2.5rem;
+  opacity: 0.7;
+}
+.mobile-links {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+.mobile-item {
+  font-family: 'Cinzel', serif;
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  color: var(--cream);
+  text-decoration: none;
+  transition: color 0.3s ease, transform 0.3s ease;
+  display: block;
+}
+.mobile-item:hover, .mobile-item.active {
+  color: var(--gold);
+  transform: scale(1.05);
+}
+
+@media (max-width: 1024px) {
+  .nav-links {
+    display: none;
+  }
+  .mobile-nav-toggle {
+    display: flex;
+  }
+}
 </style>
 </head>
 <body>
@@ -1954,6 +2156,49 @@ img{max-width:100%;display:block}
      MAIN
 ════════════════════════════════════════════════ -->
 <div id="main">
+
+<!-- ────── LUXURY STICKY NAVBAR ────── -->
+<header id="luxury-navbar">
+  <div class="nav-container">
+    <a href="#hero" class="nav-logo">G <span class="heart">❤</span> S</a>
+    <nav class="nav-links">
+      <a href="#hero" class="nav-item active">Home</a>
+      <a href="#gallery" class="nav-item">Glimpses</a>
+      <a href="#ladke" class="nav-item">Groom Side</a>
+      <a href="#ladki" class="nav-item">Bride Side</a>
+      <a href="#story" class="nav-item">Our Story</a>
+      <a href="#family-photographs" class="nav-item">Memories</a>
+      <a href="#countdown" class="nav-item">Muhurat</a>
+      <a href="#message" class="nav-item">RSVP</a>
+      <a href="#finale" class="nav-item">Venue</a>
+    </nav>
+    <button class="mobile-nav-toggle" id="mobileNavToggle" aria-label="Toggle Navigation">
+      <span class="bar"></span>
+      <span class="bar"></span>
+      <span class="bar"></span>
+    </button>
+  </div>
+</header>
+
+<!-- Mobile Navigation Drawer Overlay -->
+<div class="mobile-nav-overlay" id="mobileNavOverlay">
+  <div class="mobile-nav-menu">
+    <button class="mobile-nav-close" id="mobileNavClose">&times;</button>
+    <div class="mobile-nav-logo">G <span>❤</span> S</div>
+    <div class="mobile-ornament">⚜  ✦  ⚜</div>
+    <nav class="mobile-links">
+      <a href="#hero" class="mobile-item">Home</a>
+      <a href="#gallery" class="mobile-item">Glimpses</a>
+      <a href="#ladke" class="mobile-item">Groom Side</a>
+      <a href="#ladki" class="mobile-item">Bride Side</a>
+      <a href="#story" class="mobile-item">Our Story</a>
+      <a href="#family-photographs" class="mobile-item">Memories</a>
+      <a href="#countdown" class="mobile-item">Muhurat</a>
+      <a href="#message" class="mobile-item">RSVP</a>
+      <a href="#finale" class="mobile-item">Venue</a>
+    </nav>
+  </div>
+</div>
 
 <!-- ────── HERO ────── -->
 <section id="hero">
@@ -3372,6 +3617,114 @@ setTimeout(() => {
 }, 250);
 
 document.addEventListener('click', () => { if (!audioCtx) initAudio(); }, { once: true });
+
+// ═══════════════════════════════════════════════
+// PREMIUM DYNAMIC FLOATING NAVBAR SYSTEM
+// ═══════════════════════════════════════════════
+const luxuryNavbar = document.getElementById('luxury-navbar');
+const mobileNavToggle = document.getElementById('mobileNavToggle');
+const mobileNavOverlay = document.getElementById('mobileNavOverlay');
+const mobileNavClose = document.getElementById('mobileNavClose');
+const navItems = document.querySelectorAll('.nav-item');
+const mobileItems = document.querySelectorAll('.mobile-item');
+
+let lastScrollY = window.scrollY;
+
+// 1. Smart Scroll (Hide Navbar on Scroll Down, Show on Scroll Up)
+window.addEventListener('scroll', () => {
+  const currentScrollY = window.scrollY;
+  
+  if (currentScrollY > lastScrollY && currentScrollY > 120) {
+    // Scrolling down -> hide navbar smoothly
+    luxuryNavbar.classList.add('nav-hidden');
+  } else {
+    // Scrolling up -> show navbar smoothly
+    luxuryNavbar.classList.remove('nav-hidden');
+  }
+  
+  lastScrollY = currentScrollY;
+  
+  // Highlight active section on scroll
+  highlightActiveSection();
+});
+
+// 2. Active Section Highlighting
+const navSections = document.querySelectorAll('section[id]');
+function highlightActiveSection() {
+  let scrollPos = window.scrollY + 150; // Offset for better accuracy
+  
+  navSections.forEach(section => {
+    const top = section.offsetTop;
+    const height = section.offsetHeight;
+    const id = section.getAttribute('id');
+    
+    if (scrollPos >= top && scrollPos < top + height) {
+      // Set active desktop item
+      navItems.forEach(item => {
+        item.classList.remove('active');
+        if (item.getAttribute('href') === `#${id}`) {
+          item.classList.add('active');
+        }
+      });
+      
+      // Set active mobile item
+      mobileItems.forEach(item => {
+        item.classList.remove('active');
+        if (item.getAttribute('href') === `#${id}`) {
+          item.classList.add('active');
+        }
+      });
+    }
+  });
+}
+
+// 3. Smooth Scroll to Target Sections on Click
+const linksToScroll = document.querySelectorAll('.nav-item, .mobile-item, .nav-logo');
+linksToScroll.forEach(link => {
+  link.addEventListener('click', (e) => {
+    const targetId = link.getAttribute('href');
+    if (targetId && targetId.startsWith('#')) {
+      e.preventDefault();
+      const targetSec = document.querySelector(targetId);
+      if (targetSec) {
+        closeMobileMenu();
+        const navHeight = luxuryNavbar.offsetHeight;
+        const targetPos = targetSec.offsetTop - navHeight + 2; // Subtract nav height for perfect scroll offset
+        
+        window.scrollTo({
+          top: targetPos,
+          behavior: 'smooth'
+        });
+      }
+    }
+  });
+});
+
+// 4. Mobile Menu Interactions
+if (mobileNavToggle) {
+  mobileNavToggle.addEventListener('click', () => {
+    mobileNavOverlay.classList.add('open');
+  });
+}
+
+if (mobileNavClose) {
+  mobileNavClose.addEventListener('click', closeMobileMenu);
+}
+
+// Close when clicking overlay blur
+if (mobileNavOverlay) {
+  mobileNavOverlay.addEventListener('click', (e) => {
+    if (e.target === mobileNavOverlay) {
+      closeMobileMenu();
+    }
+  });
+}
+
+function closeMobileMenu() {
+  if (mobileNavOverlay) {
+    mobileNavOverlay.classList.remove('open');
+  }
+}
 </script>
 </body>
 </html>
