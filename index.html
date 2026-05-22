@@ -2852,8 +2852,6 @@ class GlobalPetal {
     pctx.translate(this.x, this.y);
     pctx.rotate(this.rot);
     pctx.fillStyle = `hsl(${this.hue},70%,75%)`;
-    pctx.shadowColor = `hsl(${this.hue},70%,75%)`;
-    pctx.shadowBlur = 4;
     pctx.beginPath();
     pctx.ellipse(0, 0, this.size / 2, this.size, 0, 0, Math.PI * 2);
     pctx.fill();
@@ -2899,7 +2897,6 @@ class LParticle {
     lctx.save();
     lctx.globalAlpha = this.alpha * (0.5 + 0.5 * Math.sin(this.tw));
     lctx.fillStyle = this.color;
-    lctx.shadowColor = this.color; lctx.shadowBlur = 6;
     lctx.beginPath(); lctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); lctx.fill();
     lctx.restore();
   }
@@ -2951,16 +2948,27 @@ setTimeout(() => {
 // ═══════════════════════════════════════════════
 const heroBg = document.getElementById('hero-bg');
 const finaleBg = document.getElementById('finale-bg');
-window.addEventListener('scroll', () => {
-  const sy = window.scrollY;
-  if (heroBg) heroBg.style.transform = `scale(1.1) translateY(${sy * 0.25}px)`;
-  const finale = document.getElementById('finale');
-  if (finale && finaleBg) {
-    const finTop = finale.offsetTop;
-    const finOff = sy - finTop;
-    if (finOff > -window.innerHeight) finaleBg.style.transform = `translateY(${finOff * 0.2}px)`;
-  }
+const finale = document.getElementById('finale');
+let finTop = finale ? finale.offsetTop : 0;
+window.addEventListener('resize', () => {
+  if (finale) finTop = finale.offsetTop;
 });
+
+let isParallaxTicking = false;
+window.addEventListener('scroll', () => {
+  if (!isParallaxTicking) {
+    window.requestAnimationFrame(() => {
+      const sy = window.scrollY;
+      if (heroBg) heroBg.style.transform = `scale(1.1) translateY(${sy * 0.25}px)`;
+      if (finale && finaleBg) {
+        const finOff = sy - finTop;
+        if (finOff > -window.innerHeight) finaleBg.style.transform = `translateY(${finOff * 0.2}px)`;
+      }
+      isParallaxTicking = false;
+    });
+    isParallaxTicking = true;
+  }
+}, { passive: true });
 
 const heroCanvas = document.getElementById('heroCanvas');
 const hctx = heroCanvas.getContext('2d');
@@ -2989,7 +2997,7 @@ class HParticle {
   draw() {
     hctx.save();
     hctx.globalAlpha = this.alpha * (0.5 + 0.5 * Math.sin(this.tw));
-    hctx.fillStyle = this.color; hctx.shadowColor = this.color; hctx.shadowBlur = 8;
+    hctx.fillStyle = this.color;
     hctx.beginPath(); hctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); hctx.fill();
     hctx.restore();
   }
@@ -3039,7 +3047,6 @@ class Firework {
     this.parts.forEach(p => {
       if (p.alpha <= 0) return;
       fctx.save(); fctx.globalAlpha = p.alpha; fctx.fillStyle = p.color;
-      fctx.shadowColor = p.color; fctx.shadowBlur = 8;
       fctx.beginPath(); fctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); fctx.fill(); fctx.restore();
     });
   }
@@ -3527,8 +3534,6 @@ class EnvGoldParticle {
     ectx.save();
     ectx.globalAlpha = this.alpha;
     ectx.fillStyle = `hsl(${38 + Math.random() * 10}, 85%, 68%)`;
-    ectx.shadowColor = 'rgba(212,175,55,0.7)';
-    ectx.shadowBlur = 5;
     ectx.beginPath();
     ectx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
     ectx.fill();
@@ -3563,8 +3568,6 @@ class EnvBurstSpark {
     ectx.save();
     ectx.globalAlpha = this.alpha;
     ectx.fillStyle = this.color;
-    ectx.shadowColor = this.color;
-    ectx.shadowBlur = 8;
     ectx.beginPath();
     ectx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
     ectx.fill();
@@ -3682,11 +3685,12 @@ const navItems = document.querySelectorAll('.nav-item');
 const mobileItems = document.querySelectorAll('.mobile-item');
 
 let lastScrollY = window.scrollY;
+let isHighlightTicking = false;
 
-// 1. Smart Scroll (Hide Navbar on Scroll Down, Show on Scroll Up)
+// 1. Smart Scroll (Hide Navbar on Scroll Down, Show on Scroll Up) with rAF Throttle
 window.addEventListener('scroll', () => {
   const currentScrollY = window.scrollY;
-  
+
   if (currentScrollY > lastScrollY && currentScrollY > 120) {
     // Scrolling down -> hide navbar smoothly
     luxuryNavbar.classList.add('nav-hidden');
@@ -3694,12 +3698,18 @@ window.addEventListener('scroll', () => {
     // Scrolling up -> show navbar smoothly
     luxuryNavbar.classList.remove('nav-hidden');
   }
-  
+
   lastScrollY = currentScrollY;
-  
-  // Highlight active section on scroll
-  highlightActiveSection();
-});
+
+  // Throttle active section highlighting to avoid layout thrashing
+  if (!isHighlightTicking) {
+    window.requestAnimationFrame(() => {
+      highlightActiveSection();
+      isHighlightTicking = false;
+    });
+    isHighlightTicking = true;
+  }
+}, { passive: true });
 
 // 2. Active Section Highlighting
 const navSections = document.querySelectorAll('section[id]');
