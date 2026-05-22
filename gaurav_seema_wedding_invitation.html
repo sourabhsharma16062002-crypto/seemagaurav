@@ -3145,11 +3145,24 @@ document.querySelectorAll('.photo-immersion').forEach(el => immersionObs.observe
 // ═══════════════════════════════════════════════
 const bgMusic = document.getElementById('bgMusic');
 const muteBtn = document.getElementById('muteBtn');
-let muted = false;
+let audioCtx = null, masterGain = null, muted = false;
+
+function initAudio() {
+  if (audioCtx) return;
+  try {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    masterGain = audioCtx.createGain();
+    masterGain.gain.setValueAtTime(0.07, audioCtx.currentTime);
+    masterGain.connect(audioCtx.destination);
+  } catch (e) {
+    console.error("Web Audio API not supported:", e);
+  }
+}
 
 // Play background music
 function playBackgroundMusic() {
   if (!bgMusic) return;
+  initAudio();
   bgMusic.volume = 0.35; // Ambient level
   bgMusic.play().then(() => {
     muted = false;
@@ -3167,6 +3180,7 @@ function playBackgroundMusic() {
 }
 
 function forcePlayOnInteraction() {
+  initAudio();
   if (bgMusic && bgMusic.paused && !muted) {
     bgMusic.volume = 0.35;
     bgMusic.play().then(() => {
@@ -3182,6 +3196,7 @@ function forcePlayOnInteraction() {
 // Toggle play/pause
 function toggleMusic() {
   if (!bgMusic) return;
+  initAudio();
   if (bgMusic.paused) {
     bgMusic.volume = 0.35;
     bgMusic.play().then(() => {
