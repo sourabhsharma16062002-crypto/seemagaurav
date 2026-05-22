@@ -2811,7 +2811,7 @@ img{max-width:100%;display:block}
 </div><!-- end #main -->
 
 <button class="mute-btn" id="muteBtn" title="Toggle music" aria-label="Toggle ambient sound">♪</button>
-<audio id="bgMusic" src="perfect.mp3" loop preload="auto"></audio>
+<audio id="bgMusic" src="perfect.mp3?v=2" loop preload="auto"></audio>
 
 <script>
 // ═══════════════════════════════════════════════
@@ -3145,24 +3145,12 @@ document.querySelectorAll('.photo-immersion').forEach(el => immersionObs.observe
 // ═══════════════════════════════════════════════
 const bgMusic = document.getElementById('bgMusic');
 const muteBtn = document.getElementById('muteBtn');
-let audioCtx = null, masterGain = null, muted = false;
-
-function initAudio() {
-  if (audioCtx) return;
-  try {
-    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    masterGain = audioCtx.createGain();
-    masterGain.gain.setValueAtTime(0.07, audioCtx.currentTime);
-    masterGain.connect(audioCtx.destination);
-  } catch (e) {
-    console.error("Web Audio API not supported:", e);
-  }
-}
+let muted = false;
 
 // Play background music
 function playBackgroundMusic() {
   if (!bgMusic) return;
-  initAudio();
+  bgMusic.volume = 0.35; // Ambient level
   bgMusic.play().then(() => {
     muted = false;
     if (muteBtn) {
@@ -3172,7 +3160,7 @@ function playBackgroundMusic() {
     }
   }).catch((err) => {
     console.log("Autoplay prevented. Waiting for user interaction.");
-    // Autoplay blocked: wait for click to play
+    // Autoplay blocked: wait for click/touchstart to play
     document.addEventListener('click', forcePlayOnInteraction, { once: true });
     document.addEventListener('touchstart', forcePlayOnInteraction, { once: true });
   });
@@ -3180,6 +3168,7 @@ function playBackgroundMusic() {
 
 function forcePlayOnInteraction() {
   if (bgMusic && bgMusic.paused && !muted) {
+    bgMusic.volume = 0.35;
     bgMusic.play().then(() => {
       if (muteBtn) {
         muteBtn.textContent = '♪';
@@ -3188,17 +3177,15 @@ function forcePlayOnInteraction() {
       }
     }).catch(err => console.log("Failed to play on interaction:", err));
   }
-  initAudio();
 }
 
 // Toggle play/pause
 function toggleMusic() {
   if (!bgMusic) return;
-  initAudio();
   if (bgMusic.paused) {
+    bgMusic.volume = 0.35;
     bgMusic.play().then(() => {
       muted = false;
-      if (masterGain) masterGain.gain.setTargetAtTime(0.07, audioCtx.currentTime, 0.2);
       if (muteBtn) {
         muteBtn.textContent = '♪';
         muteBtn.style.opacity = '1';
@@ -3208,7 +3195,6 @@ function toggleMusic() {
   } else {
     bgMusic.pause();
     muted = true;
-    if (masterGain) masterGain.gain.setTargetAtTime(0, audioCtx.currentTime, 0.2);
     if (muteBtn) {
       muteBtn.textContent = '♪̶';
       muteBtn.style.opacity = '0.5';
@@ -3668,7 +3654,7 @@ setTimeout(() => {
   animateEnvelopeCanvas();
 }, 250);
 
-document.addEventListener('click', () => { if (bgMusic && bgMusic.paused && !muted) playBackgroundMusic(); }, { once: true });
+// Global interaction fallback is handled directly by playBackgroundMusic() above
 
 // ═══════════════════════════════════════════════
 // PREMIUM DYNAMIC FLOATING NAVBAR SYSTEM
